@@ -1,0 +1,80 @@
+import sqlite3
+
+db = sqlite3.connect("base_de_donnée.db")
+
+curseur = db.cursor() #curseur permet d'exécuter les requetes SQL et lire les resultat 
+
+#Table géographiques et climatiques
+curseur.executescript("""
+DROP TABLE IF EXISTS Geographiques_et_climatiques;
+CREATE TABLE Geographiques_et_climatiques(
+    id_Geographique_et_climatiques INTEGER  PRIMARY KEY AUTOINCREMENT,
+    code_insee_com INTEGER  NOT NULL,
+    nom_com TEXT  NOT NULL,
+    reg_code INTEGER NOT NULL,
+    reg_nom TEXT NOT NULL,
+    dep_code INTEGER NOT NULL,
+    dep_nom TEXT NOT NULL,
+    population INTEGER CHECK(population > 0),
+    superficie_km2 REAL CHECK(superficie_km2 > 0),
+    densite REAL CHECK(densite > 0),
+    latitude REAL CHECK(latitude BETWEEN -90 AND 90),
+    longitude REAL CHECK(longitude BETWEEN -180 AND 180),
+    densite_cat TEXT NOT NULL,
+    alti_med REAL CHECK(alti_med >=0),
+    RR_med REAL CHECK(RR_med >= 0),
+    NBJRR1_med REAL CHECK(NBJRR1_med = 0 OR RR_med >= 1.0),
+    NBJRR5_med REAL CHECK(NBJRR5_med = 0 OR RR_med >= 5.0),
+    NBJRR10_med REAL CHECK(NBJRR10_med = 0 OR RR_med >= 10.0),
+    Tmin_med REAL,
+    Tmax_med REAL CHECK(Tmin_med <= Tmax_med),
+    Tens_vap_med REAL CHECK(Tens_vap_med >= 0),
+    Force_vent_med REAL CHECK(Force_vent_med >= 0),
+    Insolation_med REAL CHECK(Insolation_med  >= 0),
+    Rayonnement_med REAL  CHECK(Rayonnement_med >= 0)
+)
+""")
+
+
+#Table qualité de l’air
+curseur.executescript("""
+DROP TABLE IF EXISTS Qualite_Air;
+CREATE TABLE Qualite_Air(
+    id_Qualite_aire INTEGER  PRIMARY KEY AUTOINCREMENT,
+    id_Geographique_et_climatiques INTEGER, 
+    nom_dept TEXT NOT NULL,
+    nom_com TEXT  NOT NULL,
+    code_insee_com INTEGER  NOT NULL,
+    nom_station TEXT  NOT NULL,
+    code_station TEXT  NOT NULL,
+    typologie TEXT CHECK(typologie IN ('Urbaine','Périurbaine','Rurale Nationale','Rurale Régionale','Rurale proche Zone Urbaine')),
+    influence TEXT CHECK(influence IN ('Fond','Trafic','Industrielle')),
+    nom_poll TEXT CHECK(nom_poll IN ('NOX','O3','PM10','NO','NO2','SO2','H2S')),
+    valeur_poll REAL,
+    jour INTEGER CHECK(jour >= 1 and jour <= 31),
+    mois INTEGER CHECK(mois >= 1 and mois <= 12),
+    annee INTEGER CHECK(annee >= 1950 and annee <= 2022),
+    FOREIGN KEY(id_Geographique_et_climatiques) REFERENCES Geographiques_et_climatiques(id_Geographique_et_climatiques)
+)
+""")
+
+
+
+curseur.executescript("""
+DROP TABLE IF EXISTS Socio_economiques;
+CREATE TABLE Socio_economiques(
+    id_Socio_economiques INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_Geographique_et_climatiques INTEGER, 
+    code_insee_com INTEGER  NOT NULL,
+    nom_com TEXT  NOT NULL,
+    niveau_vie_median_2021  INT NOT NULL,
+    nb_logements_2022  INTEGER NOT NULL,
+    Pourcentage_appartements_2022 REAL NOT NULL,
+    pourcentage_locataires_dans_résidence_principale_2022 REAL NOT NULL,
+    evolution_annuelle_moy_de_la_population_entre_2017_et_2023_en_pourcentage REAL NOT NULL,
+    population_municipale_2023 INTEGER NOT NULL,
+    Taux_activite_tranche_15_64_en_2022 REAL NOT NULL,
+    FOREIGN KEY(id_Geographique_et_climatiques) REFERENCES Geographiques_et_climatiques(id_Geographique_et_climatiques)
+ 
+)
+""")
