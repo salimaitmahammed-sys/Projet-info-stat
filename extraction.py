@@ -74,13 +74,18 @@ curseur.execute("SELECT * from Vue_Montauban")
 Montauban = curseur.fetchall()
 
 curseur.execute("SELECT * from Vue_Narbonne")
-Narbonna = curseur.fetchall()
+Narbonne = curseur.fetchall()
 
+for ligne in Montauban:
+    # ligne[0] = nom_com, ligne[1] = valeur_poll, etc.
+    print(f"{ligne[0]:<12} | {ligne[1]:<12} | {ligne[2]:<10} | {ligne[3]:<10}")
+
+# Affichage des données de Narbonne
+for ligne in Narbonne:
+    print(f"{ligne[0]:<12} | {ligne[1]:<12} | {ligne[2]:<10} | {ligne[3]:<10}")
 
 # Valider les créations de vues dans le fichier .db
 connecte.commit()
 print("\nVues créées avec succès.")
-
 #Fermer
 connecte.close()
-
